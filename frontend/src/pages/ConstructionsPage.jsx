@@ -234,56 +234,67 @@ const ConstructionsPage = () => {
 
             {/* Construction List */}
             <div className="max-h-96 overflow-y-auto space-y-3">
-              {filteredConstructions.map((construction) => (
-                <Card
-                  key={construction.id}
-                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                    selectedConstructions.includes(construction.id) ? 'ring-2 ring-red-500' : ''
-                  }`}
-                  onClick={() => handleConstructionClick(construction)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedConstructions.includes(construction.id)}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          toggleConstructionSelection(construction.id);
-                        }}
-                        className="mt-1"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline" className="text-xs">
-                            ID: {construction.id}
-                          </Badge>
-                          <Badge 
-                            className={`text-xs ${
-                              construction.format === 'Медиаборд' 
-                                ? 'bg-blue-100 text-blue-800' 
-                                : 'bg-green-100 text-green-800'
-                            }`}
-                          >
-                            {construction.format}
-                          </Badge>
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+                  <p className="text-gray-600 mt-2">Загрузка...</p>
+                </div>
+              ) : filteredConstructions.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">Конструкции не найдены</p>
+                </div>
+              ) : (
+                filteredConstructions.map((construction) => (
+                  <Card
+                    key={construction.id}
+                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                      selectedConstructions.includes(construction.id) ? 'ring-2 ring-red-500' : ''
+                    }`}
+                    onClick={() => handleConstructionClick(construction)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedConstructions.includes(construction.id)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            toggleConstructionSelection(construction.id);
+                          }}
+                          className="mt-1"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="text-xs">
+                              ID: {construction.externalId || construction.id}
+                            </Badge>
+                            <Badge 
+                              className={`text-xs ${
+                                construction.format === 'Медиаборд' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : 'bg-green-100 text-green-800'
+                              }`}
+                            >
+                              {construction.format}
+                            </Badge>
+                          </div>
+                          <h3 className="font-medium text-sm text-gray-900 truncate">
+                            {construction.address}
+                          </h3>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {construction.category || construction.city}
+                          </p>
                         </div>
-                        <h3 className="font-medium text-sm text-gray-900 truncate">
-                          {construction.title}
-                        </h3>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {construction.location}
-                        </p>
+                        <img
+                          src={`https://via.placeholder.com/60x60/1a365d/ffffff?text=${construction.externalId || construction.id}`}
+                          alt={construction.address}
+                          className="w-12 h-12 object-cover rounded border"
+                        />
                       </div>
-                      <img
-                        src={construction.image}
-                        alt={construction.title}
-                        className="w-12 h-12 object-cover rounded border"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </div>
 
