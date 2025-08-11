@@ -31,15 +31,15 @@ const ConstructionModal = ({ construction, isOpen, onClose }) => {
   };
 
   const details = [
-    { label: 'ID', value: construction.id, icon: <Building className="h-4 w-4" /> },
-    { label: 'Адрес', value: construction.title, icon: <MapPin className="h-4 w-4" /> },
+    { label: 'ID', value: construction.externalId || construction.id, icon: <Building className="h-4 w-4" /> },
+    { label: 'Адрес', value: construction.address, icon: <MapPin className="h-4 w-4" /> },
     { label: 'Формат', value: construction.format, icon: <Eye className="h-4 w-4" /> },
     { label: 'Размер', value: construction.size || 'Не указан', icon: <Ruler className="h-4 w-4" /> },
-    { label: 'Локация', value: construction.category, icon: <MapPin className="h-4 w-4" /> },
-    { label: 'Расположение', value: construction.location || 'Не указано', icon: <MapPin className="h-4 w-4" /> },
+    { label: 'Локация', value: construction.category || construction.city, icon: <MapPin className="h-4 w-4" /> },
     { label: 'Класс', value: construction.classification || 'Не указан', icon: <Building className="h-4 w-4" /> },
     { label: 'Освещение', value: construction.lighting || 'Не указано', icon: <Eye className="h-4 w-4" /> },
     { label: 'Направление', value: construction.orientation || 'Не указано', icon: <Eye className="h-4 w-4" /> },
+    { label: 'Статус', value: construction.status || 'Active', icon: <Eye className="h-4 w-4" /> },
   ];
 
   return (
