@@ -1,100 +1,112 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { MapPin } from 'lucide-react';
 
 const YandexMap = ({ constructions, onConstructionClick }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState(null);
 
   useEffect(() => {
-    // Load Yandex Maps API
-    if (!window.ymaps) {
-      const script = document.createElement('script');
-      script.src = 'https://api-maps.yandex.ru/2.1/?apikey=YOUR_API_KEY&lang=ru_RU';
-      script.async = true;
-      script.onload = initMap;
-      document.head.appendChild(script);
-    } else {
-      initMap();
-    }
-
-    function initMap() {
-      if (window.ymaps && mapRef.current) {
-        window.ymaps.ready(() => {
-          // Create map centered on Almaty
-          mapInstance.current = new window.ymaps.Map(mapRef.current, {
-            center: [43.238293, 76.889311], // Almaty center
-            zoom: 11,
-            controls: ['zoomControl', 'fullscreenControl']
+    // For now, let's create a simple interactive map placeholder
+    // that shows construction locations without external API dependency
+    
+    if (mapRef.current && constructions.length > 0) {
+      // Create a simple grid of construction markers
+      const mapContainer = mapRef.current;
+      mapContainer.innerHTML = ''; // Clear previous content
+      
+      // Create a mock map background
+      const mapBg = document.createElement('div');
+      mapBg.className = 'relative w-full h-full bg-gradient-to-br from-green-100 to-blue-100 rounded-lg overflow-hidden';
+      mapBg.style.backgroundImage = `
+        radial-gradient(circle at 20% 30%, rgba(34, 197, 94, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(156, 163, 175, 0.05) 0%, transparent 60%)
+      `;
+      
+      // Add construction markers
+      constructions.slice(0, 20).forEach((construction, index) => {
+        if (construction.coordinates && construction.coordinates !== 'nan') {
+          const marker = document.createElement('div');
+          marker.className = `absolute w-8 h-8 cursor-pointer transform -translate-x-1/2 -translate-y-1/2 
+                             rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10
+                             ${construction.format === 'Медиаборд' ? 'bg-blue-500' : 'bg-green-500'}`;
+          
+          // Position markers in a grid-like pattern for demo
+          const x = 10 + (index % 8) * 12; // Spread across width
+          const y = 15 + Math.floor(index / 8) * 15; // Stack vertically
+          marker.style.left = `${x}%`;
+          marker.style.top = `${y}%`;
+          
+          // Add marker content
+          marker.innerHTML = `
+            <div class="w-full h-full rounded-full flex items-center justify-center text-white text-xs font-bold">
+              ${construction.id.toString().slice(-2)}
+            </div>
+          `;
+          
+          // Add click handler
+          marker.addEventListener('click', () => {
+            onConstructionClick(construction);
           });
-
-          // Add constructions to map
-          constructions.forEach((construction) => {
-            if (construction.coordinates && construction.coordinates !== 'nan') {
-              const [lat, lng] = construction.coordinates.split(',').map(coord => parseFloat(coord.trim()));
-              
-              if (!isNaN(lat) && !isNaN(lng)) {
-                const placemark = new window.ymaps.Placemark(
-                  [lat, lng],
-                  {
-                    balloonContentHeader: `ID: ${construction.id}`,
-                    balloonContentBody: `
-                      <div style="padding: 10px;">
-                        <h4 style="margin: 0 0 10px 0; font-weight: bold;">${construction.title}</h4>
-                        <p style="margin: 0 0 5px 0;"><strong>Формат:</strong> ${construction.format}</p>
-                        <p style="margin: 0 0 5px 0;"><strong>Размер:</strong> ${construction.size}</p>
-                        <p style="margin: 0 0 5px 0;"><strong>Локация:</strong> ${construction.category}</p>
-                        <img src="${construction.image}" alt="${construction.title}" style="width: 200px; height: 150px; object-fit: cover; border-radius: 8px; margin-top: 10px;" />
-                      </div>
-                    `,
-                    balloonContentFooter: `
-                      <button onclick="window.selectConstruction('${construction.id}')" style="background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">
-                        Подробнее
-                      </button>
-                    `
-                  },
-                  {
-                    iconLayout: 'default#image',
-                    iconImageHref: construction.format === 'Медиаборд' 
-                      ? 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMzNzM3ZmYiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0ibTQgNCA4IDQtNCA0eiIgZmlsbD0iI2ZmZiIvPgo8L3N2Zz4KPC9zdmc+'
-                      : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMxNmE2NGYiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0ibTQgNCA4IDQtNCA0eiIgZmlsbD0iI2ZmZiIvPgo8L3N2Zz4KPC9zdmc+',
-                    iconImageSize: [32, 32],
-                    iconImageOffset: [-16, -16]
-                  }
-                );
-
-                mapInstance.current.geoObjects.add(placemark);
-
-                // Add click handler
-                placemark.events.add('click', () => {
-                  onConstructionClick(construction);
-                });
-              }
-            }
-          });
-
-          // Global function for balloon button clicks
-          window.selectConstruction = (constructionId) => {
-            const construction = constructions.find(c => c.id === constructionId);
-            if (construction) {
-              onConstructionClick(construction);
-            }
-          };
-        });
-      }
+          
+          // Add hover effect with tooltip
+          marker.title = `ID: ${construction.id} - ${construction.title}`;
+          
+          mapBg.appendChild(marker);
+        }
+      });
+      
+      // Add city labels
+      const almatyLabel = document.createElement('div');
+      almatyLabel.className = 'absolute text-lg font-bold text-gray-700';
+      almatyLabel.style.left = '45%';
+      almatyLabel.style.top = '45%';
+      almatyLabel.innerHTML = 'Алматы';
+      mapBg.appendChild(almatyLabel);
+      
+      mapContainer.appendChild(mapBg);
+      setIsMapLoaded(true);
     }
-
-    return () => {
-      if (mapInstance.current) {
-        mapInstance.current.destroy();
-      }
-    };
   }, [constructions, onConstructionClick]);
 
+  if (mapError) {
+    return (
+      <div className="w-full h-96 bg-gray-100 rounded-lg flex flex-col items-center justify-center">
+        <MapPin className="h-12 w-12 text-gray-400 mb-4" />
+        <p className="text-gray-600 text-center">
+          Карта временно недоступна
+          <br />
+          <span className="text-sm">{mapError}</span>
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div
-      ref={mapRef}
-      className="w-full h-96 bg-gray-200 rounded-lg overflow-hidden"
-      style={{ minHeight: '400px' }}
-    />
+    <div className="w-full">
+      <div
+        ref={mapRef}
+        className="w-full h-96 bg-gray-200 rounded-lg overflow-hidden border border-gray-300"
+        style={{ minHeight: '400px' }}
+      />
+      <div className="mt-4 text-center">
+        <p className="text-sm text-gray-600">
+          Показано: {Math.min(constructions.length, 20)} из {constructions.length} конструкций
+        </p>
+        <div className="flex items-center justify-center gap-4 mt-2">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+            <span className="text-sm text-gray-600">Медиаборды</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+            <span className="text-sm text-gray-600">Ситиборды</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
