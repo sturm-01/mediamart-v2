@@ -12,22 +12,16 @@ const ConstructionModal = ({ construction, isOpen, onClose }) => {
   if (!construction) return null;
 
   const handleDownload = (format) => {
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+    const downloadUrl = `${BACKEND_URL}/api/files/download/${format}/${Date.now()}?ids=${construction.id}`;
+    
     toast({
       title: `Скачивание ${format.toUpperCase()}`,
-      description: `Файл с данными конструкции ID: ${construction.id}`,
+      description: `Файл с данными конструкции ID: ${construction.externalId || construction.id}`,
     });
 
-    // Simulate file download
-    setTimeout(() => {
-      const content = `Construction ID: ${construction.id}\nTitle: ${construction.title}\nFormat: ${construction.format}`;
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `construction_${construction.id}.${format}`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }, 500);
+    // Open download URL in new tab
+    window.open(downloadUrl, '_blank');
   };
 
   const details = [
