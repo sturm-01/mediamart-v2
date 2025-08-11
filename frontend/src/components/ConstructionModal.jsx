@@ -47,7 +47,7 @@ const ConstructionModal = ({ construction, isOpen, onClose }) => {
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-900">
-            Конструкция #{construction.id}
+            Конструкция #{construction.externalId || construction.id}
           </DialogTitle>
         </DialogHeader>
         
@@ -55,8 +55,8 @@ const ConstructionModal = ({ construction, isOpen, onClose }) => {
           {/* Construction Image */}
           <div className="aspect-video w-full overflow-hidden rounded-lg bg-gray-100">
             <img
-              src={construction.image}
-              alt={construction.title}
+              src={`https://via.placeholder.com/600x400/1a365d/ffffff?text=ID+${construction.externalId || construction.id}`}
+              alt={construction.address}
               className="w-full h-full object-cover"
             />
           </div>
