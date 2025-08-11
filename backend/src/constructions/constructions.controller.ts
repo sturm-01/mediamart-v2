@@ -162,7 +162,7 @@ export class ConstructionsController {
         ...results,
         totalProcessed: constructionsData.length,
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to process Excel file: ${error.message}`);
     }
   }
