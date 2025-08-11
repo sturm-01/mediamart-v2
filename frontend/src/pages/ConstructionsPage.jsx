@@ -9,30 +9,61 @@ import { useToast } from '../hooks/use-toast';
 import ConstructionModal from '../components/ConstructionModal';
 import ExcelUploadModal from '../components/ExcelUploadModal';
 import YandexMap from '../components/YandexMap';
-import constructionsData from '../data/constructions.json';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const ConstructionsPage = () => {
   const [constructions, setConstructions] = useState([]);
   const [filteredConstructions, setFilteredConstructions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [formatFilter, setFormatFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
   const [selectedConstruction, setSelectedConstruction] = useState(null);
   const [isConstructionModalOpen, setIsConstructionModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedConstructions, setSelectedConstructions] = useState([]);
   const { toast } = useToast();
 
+  // Load constructions from backend
+  const loadConstructions = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      
+      if (searchTerm) params.append('q', searchTerm);
+      if (formatFilter !== 'all') {
+        params.append('format', formatFilter === 'mediaboard' ? 'Медиаборд' : 'Ситиборд');
+      }
+      params.append('limit', '500'); // Load more constructions
+
+      const response = await axios.get(`${API}/constructions?${params.toString()}`);
+      const data = response.data;
+      
+      setConstructions(data.items || []);
+      setFilteredConstructions(data.items || []);
+    } catch (error) {
+      console.error('Error loading constructions:', error);
+      toast({
+        title: "Ошибка загрузки",
+        description: "Не удалось загрузить конструкции",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Load constructions data
-    setConstructions(constructionsData);
-    setFilteredConstructions(constructionsData);
-  }, []);
+    loadConstructions();
+  }, [searchTerm, formatFilter]);
 
   // Filter constructions based on search and format
   const filteredResults = useMemo(() => {
     return constructions.filter(construction => {
-      const matchesSearch = construction.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          construction.id.toString().includes(searchTerm);
+      const matchesSearch = construction.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          construction.externalId?.toString().includes(searchTerm);
       
       const matchesFormat = formatFilter === 'all' || 
                            (formatFilter === 'mediaboard' && construction.format === 'Медиаборд') ||
@@ -61,16 +92,9 @@ const ConstructionsPage = () => {
       description: `Готовится файл с ${selectedIds.length} конструкциями`,
     });
 
-    // Simulate file download
-    setTimeout(() => {
-      const blob = new Blob([`Construction data in ${format} format`], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `constructions.${format}`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }, 1000);
+    // Use the backend download API
+    const downloadUrl = `${API}/files/download/${format}/${Date.now()}?ids=${selectedIds.join(',')}`;
+    window.open(downloadUrl, '_blank');
   };
 
   const toggleConstructionSelection = (constructionId) => {
