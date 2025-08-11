@@ -27,13 +27,13 @@ const YandexMap = ({ constructions, onConstructionClick }) => {
       
       // Add construction markers
       constructions.slice(0, 20).forEach((construction, index) => {
-        if (construction.coordinates && construction.coordinates !== 'nan') {
+        if (construction.lat && construction.lng) {
           const marker = document.createElement('div');
           marker.className = `absolute w-8 h-8 cursor-pointer transform -translate-x-1/2 -translate-y-1/2 
                              rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10
                              ${construction.format === 'Медиаборд' ? 'bg-blue-500' : 'bg-green-500'}`;
           
-          // Position markers in a grid-like pattern for demo
+          // Position markers based on real coordinates for demo (simplified)
           const x = 10 + (index % 8) * 12; // Spread across width
           const y = 15 + Math.floor(index / 8) * 15; // Stack vertically
           marker.style.left = `${x}%`;
@@ -42,7 +42,7 @@ const YandexMap = ({ constructions, onConstructionClick }) => {
           // Add marker content
           marker.innerHTML = `
             <div class="w-full h-full rounded-full flex items-center justify-center text-white text-xs font-bold">
-              ${construction.id.toString().slice(-2)}
+              ${(construction.externalId || construction.id).toString().slice(-2)}
             </div>
           `;
           
@@ -52,7 +52,7 @@ const YandexMap = ({ constructions, onConstructionClick }) => {
           });
           
           // Add hover effect with tooltip
-          marker.title = `ID: ${construction.id} - ${construction.title}`;
+          marker.title = `ID: ${construction.externalId || construction.id} - ${construction.address}`;
           
           mapBg.appendChild(marker);
         }
