@@ -104,11 +104,11 @@ const ConstructionModal = ({ construction, isOpen, onClose }) => {
           )}
 
           {/* Coordinates */}
-          {construction.coordinates && construction.coordinates !== 'nan' && (
+          {construction.lat && construction.lng && (
             <Card className="border-blue-200 bg-blue-50">
               <CardContent className="p-4">
                 <h4 className="font-semibold text-blue-800 mb-2">Координаты:</h4>
-                <p className="text-blue-700 font-mono">{construction.coordinates}</p>
+                <p className="text-blue-700 font-mono">{construction.lat}, {construction.lng}</p>
               </CardContent>
             </Card>
           )}
