@@ -149,7 +149,7 @@ export class ConstructionsService {
           await this.constructionsRepository.save(construction);
           results.created++;
         }
-      } catch (error) {
+      } catch (error: any) {
         results.errors.push(`Error processing construction: ${error.message}`);
       }
     }
