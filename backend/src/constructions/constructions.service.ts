@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, ILike } from 'typeorm';
-import { Construction, ConstructionStatus } from './entities/construction.entity';
+import { Construction, ConstructionStatus, ConstructionFormat } from './entities/construction.entity';
 import { StatusHistory } from './entities/status-history.entity';
 import { CreateConstructionDto } from './dto/create-construction.dto';
 import { UpdateConstructionDto } from './dto/update-construction.dto';
