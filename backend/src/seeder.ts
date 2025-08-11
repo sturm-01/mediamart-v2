@@ -33,7 +33,7 @@ async function seed() {
     const stats = await constructionsService.getStats();
     console.log('📊 Final statistics:', stats);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Seeding failed:', error.message);
   } finally {
     await app.close();
