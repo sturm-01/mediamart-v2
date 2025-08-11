@@ -160,10 +160,10 @@ export class ConstructionsService {
   async getStats() {
     const total = await this.constructionsRepository.count();
     const mediaboards = await this.constructionsRepository.count({
-      where: { format: 'Медиаборд' },
+      where: { format: ConstructionFormat.MEDIABOARD },
     });
     const cityboards = await this.constructionsRepository.count({
-      where: { format: 'Ситиборд' },
+      where: { format: ConstructionFormat.CITYBOARD },
     });
     const active = await this.constructionsRepository.count({
       where: { status: ConstructionStatus.ACTIVE },
